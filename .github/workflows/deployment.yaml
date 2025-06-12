@@ -20,11 +20,19 @@ jobs:
       - name: push tagged image for backup
         run: docker push ${{vars.DOCKER_USERNAME}}/food-app:$GITHUB_RUN_NUMBER
     
-  
+  old-deployment:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Remove COntainer
+        run: docker container rm -f ${{vars.CONTAINER_NAME}}
+      - name: remove old image
+        run: docker rmi ${{vars.DOCKER_USERNAME}}/food-app:latest
 
       
   
   deploy:
+    needs: old-deployment
     runs-on: self-hosted
     steps:
       - name: pull the image
